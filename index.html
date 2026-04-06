@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- lib para ler planilhas -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="script.js" defer></script>
+
+    <title>Analisador de planilhas</title>
+</head>
+
+<body>
+    <main>
+        <div class="box-label">
+            <label for="plan1">
+                <p>Adicione a planilha de <span>SSI</span></p>
+                <input type="file" id="plan1" class="input-file" accept=".xlsx,.xls">
+                <div class="modal-file ">
+                    <i class="bi bi-file-earmark-zip-fill"></i>
+                    <p id="archive-desc-1">Esperando arquivo...</p>
+                </div>
+            </label>
+        </div>
+
+        <div class="box-label">
+            <label for="plan2">
+                <p>Adicione a planilha de <span>VENDAS</span></p>
+                <input type="file" id="plan2" class="input-file" accept=".xlsx,.xls">
+                <div class="modal-file">
+                    <i class="bi bi-file-earmark-zip-fill"></i>
+                    <p id="archive-desc-2">Esperando arquivo...</p>
+                </div>
+            </label>
+        </div>
+
+        <p id="error-msg" class="display-none">Selecione os arquivo</p>
+
+        <button id="action-btn" class="action-btn">
+            Analisar
+        </button>
+    </main>
+
+    <div id="modal-help" class="display-none">
+        <div id="result-table">
+            <table id="dinamicTable">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <article id="total-amount-box">
+            <strong>Total</strong>
+
+            <p id="total-amount">0</p>
+        </article>
+
+        <button id="exportExcelBtn">EXPORTAR </button>
+    </div>
+</body>
+
+</html>
