@@ -18,24 +18,56 @@
     <main>
         <div class="box-label">
             <label for="plan1">
-                <p>Adicione a planilha de <span>SSI</span></p>
+                <p>Adicione a primeira planilha</p>
                 <input type="file" id="plan1" class="input-file" accept=".xlsx,.xls">
                 <div class="modal-file ">
                     <i class="bi bi-file-earmark-zip-fill"></i>
                     <p id="archive-desc-1">Esperando arquivo...</p>
                 </div>
             </label>
+
+            <div class="select-box">
+                <label for="col_planilha_1">Coluna à procurar</label>
+                <select name="" id="col_planilha_1">
+                    <option value="">--Selecione uma planilha--</option>
+                </select>
+            </div>
         </div>
 
         <div class="box-label">
             <label for="plan2">
-                <p>Adicione a planilha de <span>VENDAS</span></p>
+                <p>Adicione a segunda planilha</p>
                 <input type="file" id="plan2" class="input-file" accept=".xlsx,.xls">
                 <div class="modal-file">
                     <i class="bi bi-file-earmark-zip-fill"></i>
                     <p id="archive-desc-2">Esperando arquivo...</p>
                 </div>
             </label>
+
+            <div class="select-box">
+                <label for="col_planilha_2">Coluna à procurar</label>
+                <select name="" id="col_planilha_2">
+                    <option value="">--Selecione uma planilha--</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="box-label">
+            <div class="select-box">
+                <label for="planilha_retornar">Planilha à retornar</label>
+                <select name="planilha_retornar" id="planilha_retornar">
+                    <option value="0">--Selecionar--</option>
+                    <option value="1">Planilha 1</option>
+                    <option value="2">Planilha 2</option>
+                </select>
+            </div>
+
+            <div class="select-box">
+                <label for="coluna_retornar">Coluna à retornar</label>
+                <select name="coluna_retornar" id="coluna_retornar">
+                    <option value="">--Selecionar--</option>
+                </select>
+            </div>
         </div>
 
         <p id="error-msg" class="display-none">Selecione os arquivo</p>

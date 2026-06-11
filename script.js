@@ -1,8 +1,15 @@
+
 const arcDesc1 = document.querySelector('#archive-desc-1');
 const arcDesc2 = document.querySelector('#archive-desc-2');
 
 const inputPlan1 = document.querySelector('#plan1');
 const inputPlan2 = document.querySelector('#plan2');
+
+const selectBox = document.querySelectorAll(".select-box");
+const selectPlan1 = document.querySelector("#col_planilha_1")
+const selectPlan2 = document.querySelector("#col_planilha_2")
+const planilhaRetornar = document.querySelector("#planilha_retornar");
+const colunaRetornar = document.querySelector("#coluna_retornar");
 
 const modalFileArray = document.querySelectorAll('.modal-file');
 
@@ -14,95 +21,68 @@ const totalAmount = document.querySelector('#total-amount');
 const exportBtn = document.querySelector('#exportExcelBtn');
 const totalAmountBox = document.querySelector('#total-amount-box')
 
+const startBtn = document.querySelector('#action-btn')
+
 let exportData = [];
 
-inputPlan1.addEventListener('change', () => {
-    if (inputPlan1.files[0]) arcDesc1.textContent = inputPlan1.files[0].name
+let colunasPlan1 = [];
+let colunasPlan2 = [];
+
+inputPlan1.addEventListener('change', async () => {
+    if (!inputPlan1.files[0]) return;
+
+    arcDesc1.textContent = formatFileName(inputPlan1.files[0].name);
+
+    colunasPlan1 = await obterCabecalho(inputPlan1.files[0]);
+
+    construirSelect(selectPlan1, colunasPlan1);
+
+    selectBox[0].style.display = "flex";
+
+    visibleRetornar();
 })
-inputPlan2.addEventListener('change', () => {
-    if (inputPlan2.files[0]) arcDesc2.textContent = inputPlan2.files[0].name
+inputPlan2.addEventListener('change', async () => {
+    if (!inputPlan2.files[0]) return;
+
+    arcDesc2.textContent = formatFileName(inputPlan2.files[0].name)
+
+    colunasPlan2 = await obterCabecalho(inputPlan2.files[0]);
+
+    construirSelect(selectPlan2, colunasPlan2);
+
+    selectBox[1].style.display = "flex";
+
+    visibleRetornar();
 })
 
-function showError(menssagem) {
-    modalFileArray.forEach(modal => {
-        modal.classList.add('border-text-red')
-    })
-    messageError.classList.remove('display-none');
-    messageError.textContent = menssagem;
-}
+planilhaRetornar.addEventListener('change', () => {
+    colunaRetornar.innerHTML = "";
 
-function hiddenError() {
-    modalFileArray.forEach(modal => {
-        modal.classList.remove('border-text-red')
-    })
-    messageError.classList.add('display-none');
-}
+    if (planilhaRetornar.value == 1) {
 
-function lerExcel(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
+        colunasPlan1.forEach(coluna => {
+            const option = document.createElement("option");
 
-        reader.onload = function (e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: "array" });
+            option.value = coluna;
+            option.textContent = coluna;
 
-                const primeiraAba = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[primeiraAba];
+            colunaRetornar.appendChild(option);
+        })
+    }
 
-                const json = XLSX.utils.sheet_to_json(worksheet, { header: "A" });
+    if (planilhaRetornar.value == 2) {
 
-                resolve(json);
-            } catch (erro_onload) {
-                reject(erro_onload);
-            }
-        }
+        colunasPlan2.forEach(coluna => {
+            const option = document.createElement("option");
 
-        reader.onerror = function (erro) {
-            reject(erro);
-        };
+            option.value = coluna;
+            option.textContent = coluna;
 
-        reader.readAsArrayBuffer(file);
-    });
-}
+            colunaRetornar.appendChild(option);
+        })
+    }
+})
 
-function padronizarValor(valor) {
-    return String(valor ?? "").trim().replace(/\s+/g, "").replace(/\.0$/, "");
-}
-
-function compararPlanilhas(plan1, plan2) {
-    const resultado = [];
-    const mapaPlan2 = new Map();
-
-    //indexando planilha 2 pela coluna "A"
-    plan2.forEach((linha2, index) => {
-        const valorA = padronizarValor(linha2.A)
-
-        if (valorA) {
-            mapaPlan2.set(valorA, { ...linha2, __linhaPlan2: index + 1 });
-        }
-    });
-
-    //Percorrendo planilha 1 para dar matchs com coluna A
-    plan1.forEach(linha1 => {
-        let valorA = padronizarValor(linha1.A);
-
-        if (valorA.includes("-")) {
-            valorA = padronizarValor(valorA.split("-")[1].trim());
-        } else {
-            valorA = padronizarValor(valorA.trim());
-        }
-
-        if (mapaPlan2.has(valorA)) {
-            const linha2 = mapaPlan2.get(valorA);
-            resultado.push({ valorComparado: valorA, dadosPlan2: linha2 });
-        }
-    });
-
-    return resultado;
-}
-
-const startBtn = document.querySelector('#action-btn')
 startBtn.addEventListener('click', async () => {
     const plan1 = document.querySelector('#plan1').files[0];
     const plan2 = document.querySelector('#plan2').files[0];
@@ -118,12 +98,24 @@ startBtn.addEventListener('click', async () => {
         const dadosPlan1 = await lerExcel(plan1);
         const dadosPlan2 = await lerExcel(plan2);
 
+        const colunaPlan1Selecionada = selectPlan1.value;
+        const colunaPlan2Selecionada = selectPlan2.value;
 
-        const resultado = compararPlanilhas(dadosPlan1, dadosPlan2);
+        const colunaRetornoSelecionada = colunaRetornar.value;
+
+        const origemRetornoSelecionada =
+            planilhaRetornar.value;
+
+        console.log('Planilha1', dadosPlan1);
+        console.log('Planilha2', dadosPlan2);
+
+        const resultado = compararPlanilhas(dadosPlan1, dadosPlan2, colunaPlan1Selecionada, colunaPlan2Selecionada, colunaRetornoSelecionada, origemRetornoSelecionada);
 
         const contagem = resultado.reduce((acc, item) => {
-            const nome = item.dadosPlan2.B;
+            const nome = item.valorRetornado;
+
             acc[nome] = (acc[nome] || 0) + 1;
+
             return acc;
         }, {})
 
@@ -136,6 +128,62 @@ startBtn.addEventListener('click', async () => {
         showError('Algo deu errado ao analisar planilhas');
     }
 })
+
+exportBtn.addEventListener('click', exportExcel);
+
+async function obterCabecalho(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
+
+                const primeiraAba = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[primeiraAba];
+
+                const linhas = XLSX.utils.sheet_to_json(worksheet, {
+                    header: 1
+                });
+
+                resolve(linhas[0] || []);
+            } catch (erro) {
+                reject(erro);
+            }
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function formatFileName(fileName) {
+    if (fileName.length > 13) {
+        return fileName.slice(0, 13).trim() + '...'
+    }
+
+    return fileName.trim();
+}
+
+function visibleRetornar() {
+    if (selectPlan1?.value != '' && selectPlan2?.value != '') {
+        selectBox[2].style.display = "flex";
+        selectBox[3].style.display = "flex";
+    }
+}
+
+function construirSelect(select, colunas) {
+    select.innerHTML = "";
+
+    colunas.forEach(coluna => {
+        const option = document.createElement("option");
+
+        option.value = coluna;
+        option.textContent = coluna;
+
+        select.appendChild(option);
+    })
+}
 
 function renderTable(contagem) {
     const tabela = document.querySelector('#dinamicTable');
@@ -207,4 +255,88 @@ function exportExcel() {
     XLSX.writeFile(workBook, "respostas_ssi_por_vendedor.xlsx");
 }
 
-exportBtn.addEventListener('click', exportExcel);
+function showError(menssagem) {
+    modalFileArray.forEach(modal => {
+        modal.classList.add('border-text-red')
+    })
+    messageError.classList.remove('display-none');
+    messageError.textContent = menssagem;
+}
+
+function hiddenError() {
+    modalFileArray.forEach(modal => {
+        modal.classList.remove('border-text-red')
+    })
+    messageError.classList.add('display-none');
+}
+
+function lerExcel(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
+
+                const primeiraAba = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[primeiraAba];
+
+                const json = XLSX.utils.sheet_to_json(worksheet);
+
+                resolve(json);
+            } catch (erro_onload) {
+                reject(erro_onload);
+            }
+        }
+
+        reader.onerror = function (erro) {
+            reject(erro);
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function padronizarValor(valor) {
+    return String(valor ?? "").trim().replace(/\s+/g, "").replace(/\.0$/, "");
+}
+
+function compararPlanilhas(plan1, plan2, colPlan1, colPlan2, colunaRetorno, origemRetorno) {
+    const resultado = [];
+    const mapaPlan2 = new Map();
+
+    //indexando planilha 2 pela coluna "A"
+    plan2.forEach((linha2, index) => {
+        const valorComparacao = padronizarValor(linha2[colPlan2])
+
+        if (valorComparacao) {
+            mapaPlan2.set(valorComparacao, { ...linha2, __linhaPlan2: index + 1 });
+        }
+    });
+
+    //Percorrendo planilha 1 para dar matchs com coluna A
+    plan1.forEach(linha1 => {
+        const valorComparacao = padronizarValor(linha1[colPlan1]);
+
+        if (mapaPlan2.has(valorComparacao)) {
+            const linha2 = mapaPlan2.get(valorComparacao);
+
+            let valorRetornado;
+
+            if (origemRetorno === "1") {
+                valorRetornado = linha1[colunaRetorno];
+            } else {
+                valorRetornado = linha2[colunaRetorno];
+            }
+
+            resultado.push({
+                valorComparado: valorComparacao,
+                valorRetornado
+            });
+        }
+    });
+
+    return resultado;
+}
+

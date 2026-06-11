@@ -18,7 +18,7 @@ body {
 }
 
 main {
-    padding: 55px;
+    padding: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -30,10 +30,19 @@ main {
     border-radius: 10px;
 
     background-color: #fff;
+
+    animation: fadein .3s linear;
+}
+
+p {
+    color: #333;
 }
 
 .box-label {
+    display: flex;
+    flex-direction: column;
     width: 300px;
+    gap: 10px;
 }
 
 .box-label>label {
@@ -54,9 +63,33 @@ main {
     display: none;
 }
 
+.select-box {
+    flex-direction: column;
+    display: none;
+    gap: 8px;
+}
+
+select {
+    width: 100%;
+    padding: 15px 10px;
+    border-radius: 10px;
+    border: 2px dashed #8f8f8f;
+
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+select:hover {
+    color: #333;
+    border-color: #333;
+}
+
 .modal-file {
     width: 100%;
     border: 2px dashed #8f8f8f;
+    color: #000000;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -64,6 +97,12 @@ main {
     gap: 10px;
     border-radius: 10px;
     padding: 15px 10px;
+    transition: .2s;
+}
+
+.modal-file:hover {
+    color: #333;
+    border-color: #333;
 }
 
 
@@ -122,6 +161,8 @@ main {
     box-shadow: 0px 5px 10px rgba(170, 169, 169, 0.5);
 
     background-color: #fff;
+
+    animation: fadein 0.3s linear;
 }
 
 /* Tabela */
@@ -196,6 +237,8 @@ article {
 
     cursor: default;
     background-color: #fff;
+
+    animation: fadein 0.3s linear;
 }
 
 article>p {
@@ -215,7 +258,8 @@ article>p {
     cursor: pointer;
 
     transition: .2s ease-in-out;
-    /* font-size: medium; */
+
+    animation: fadein .3s linear;
 }
 
 #exportExcelBtn:hover {
@@ -226,4 +270,14 @@ article>p {
 
 #exportExcelBtn:active {
     transform: scale(0.95);
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 100%;
+    }
 }
